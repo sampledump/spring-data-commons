@@ -1,4 +1,4 @@
-name: Deploy Docs
+name: Trigger Antora Site Build
 on:
   push:
     branches-ignore: [ gh-pages ]
@@ -19,15 +19,15 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
         with:
-          ref: docs-build
+          repository: sampledump/antora-build
           fetch-depth: 1
       - name: Dispatch (partial build)
         if: github.ref_type == 'branch'
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh workflow run deploy-docs.yml -r $(git rev-parse --abbrev-ref HEAD) -f build-refname=${{ github.ref_name }}
+          GH_TOKEN: ${{ secrets.PAT }}
+        run: gh workflow run "Antora Site" -R sampledump/antora-build -f build-refname=${{ github.ref_name }} -f module=commons
       - name: Dispatch (full build)
         if: github.ref_type == 'tag'
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh workflow run deploy-docs.yml -r $(git rev-parse --abbrev-ref HEAD)
+          GH_TOKEN: ${{ secrets.PAT }}
+        run: gh workflow run "Antora Site" -R sampledump/antora-build
